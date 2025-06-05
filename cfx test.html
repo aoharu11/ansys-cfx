@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANSYS CFX 流体解析 超かんたんガイド</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            line-height: 1.8;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f7; /* 少し柔らかい背景色 */
+            color: #333;
+            -webkit-font-smoothing: antialiased; /* iOSフォントを滑らかに */
+            -moz-osx-font-smoothing: grayscale; /* Firefoxフォントを滑らかに */
+        }
+        .container {
+            width: 90%;
+            max-width: 1100px; /* デスクトップの最大幅は維持 */
+            margin: 20px auto; /* モバイルの上部マージン調整 */
+            padding: 15px;    /* モバイルの内部パディング調整 */
+        }
+        header {
+            background: linear-gradient(135deg, #00529b, #002d56);
+            color: #ffffff;
+            padding: 30px 15px; /* モバイルのパディング調整 */
+            text-align: center;
+            border-radius: 10px; /* 少し小さめのradius */
+            margin-bottom: 25px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+        }
+        header h1 {
+            margin: 0;
+            font-size: 26px; /* モバイルのフォントサイズ調整 */
+            font-weight: 600;
+        }
+        header p {
+            font-size: 16px; /* モバイルのフォントサイズ調整 */
+            margin-top: 8px;
+            opacity: 0.9;
+        }
+        .accordion-section {
+            background-color: #ffffff;
+            margin-bottom: 15px; /* モバイルのマージン調整 */
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+        .accordion-header {
+            background-color: #f8f9fa;
+            padding: 18px 20px; /* モバイルのパディング調整 */
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.2s ease;
+        }
+        .accordion-header:hover {
+            background-color: #e2e6ea; /* 少し明るめのホバー色 */
+        }
+        .accordion-header h2 {
+            margin: 0;
+            font-size: 18px; /* モバイルのフォントサイズ調整 */
+            color: #00529b;
+            display: flex;
+            align-items: center;
+            font-weight: 500; /* 少し細めのフォントウェイト */
+        }
+        .accordion-header h2 .icon {
+            margin-right: 12px; /* アイコンのマージン調整 */
+            font-size: 22px; /* アイコンサイズ調整 */
+            width: 25px;
+            text-align: center;
+        }
+        .accordion-header .toggle-icon {
+            font-size: 18px; /* トグルアイコンサイズ調整 */
+            transition: transform 0.3s ease;
+        }
+        .accordion-content {
+            padding: 0px 20px; /* 左右パディングは維持、上下パディングは0で開始 */
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+            font-size: 15px; /* モバイル本文フォントサイズ */
+        }
+        .accordion-content.open {
+            padding: 20px; /* 開いた際の上下左右パディング */
+            max-height: 15000px; /* 十分大きな値 */
+            border-top: 1px solid #e9ecef;
+        }
+        .accordion-content h3 {
+            font-size: 1.2em; /* モバイルに合わせたh3サイズ調整 */
+            color: #1f618d;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 7px;
+        }
+        .highlight-box, .warning-box, .tip-box {
+            padding: 10px; /* ボックス内部パディング調整 */
+            margin: 12px 0; /* ボックス上下マージン調整 */
+            border-radius: 5px;
+            font-size: 0.95em; /* ボックス内部フォントサイズ微調整 */
+        }
+        .highlight-box {
+            background-color: #e8f6f3;
+            border-left: 4px solid #48c9b0;
+        }
+        .warning-box {
+            background-color: #fdedec;
+            border-left: 4px solid #e74c3c;
+        }
+        .tip-box {
+            background-color: #fef9e7;
+            border-left: 4px solid #f39c12;
+        }
+        .action-item {
+            font-weight: bold;
+            color: #2980b9;
+        }
+        .key-concept {
+            border: 1px dashed #aed6f1;
+            padding: 10px;
+            margin: 12px 0;
+            background-color: #f4faff;
+            border-radius: 4px;
+        }
+        ul, ol {
+            margin-bottom: 10px;
+            padding-left: 25px; /* インデント調整 */
+        }
+        li {
+            margin-bottom: 6px;
+        }
+        code {
+            background-color: #eaf2f8;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* モノスペースフォント改善 */
+            color: #c0392b;
+            font-size: 0.9em; /* コードフォントサイズ調整 */
+            word-break: break-all; /* 長いコードの改行 */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-size: 0.9em; /* テーブルフォントサイズ調整 */
+        }
+        th, td {
+            border: 1px solid #d5dbdb;
+            padding: 8px 10px; /* セルパディング調整 */
+            text-align: left;
+        }
+        th {
+            background-color: #e9ecef; /* テーブルヘッダー背景色変更 */
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        /* テーブル横スクロール用ラッパー */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* iOSの滑らかなスクロール */
+            margin: 18px 0;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #343a40;
+            color: #f8f9fa;
+            margin-top: 30px;
+            border-radius: 8px;
+            font-size: 0.85em; /* フッターフォントサイズ調整 */
+        }
+
+        /* Icons */
+        .icon-intro::before { content: "🌟"; }
+        .icon-cad::before { content: "📐"; }
+        .icon-project::before { content: "📁"; }
+        .icon-geometry::before { content: "🔍"; }
+        .icon-mesh::before { content: "🔗"; }
+        .icon-setup::before { content: "⚙️"; }
+        .icon-solution::before { content: "💡"; }
+        .icon-results::before { content: "📊"; }
+        .icon-troubleshooting::before { content: "❓"; }
+
+        /* モバイル画面対応 (例: 768px以下) */
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                padding: 10px;
+            }
+            header h1 {
+                font-size: 22px;
+            }
+            header p {
+                font-size: 14px;
+            }
+            .accordion-header h2 {
+                font-size: 17px;
+            }
+            .accordion-header h2 .icon {
+                font-size: 20px;
+                margin-right: 10px;
+            }
+            .accordion-content {
+                font-size: 14px;
+            }
+            .accordion-content h3 {
+                font-size: 1.1em;
+            }
+            table {
+                font-size: 0.85em;
+            }
+            th, td {
+                padding: 6px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>ANSYS CFX 流体解析</h1>
+        <p>ステップ・バイ・ステップ 超かんたんガイド</p>
+    </header>
+
+    <div class="container">
+        <p style="text-align: center; font-size: 1.1em; margin-bottom: 30px;">
+            CFX解析の基本的な手順を分かりやすく解説します。<br>
+            各ステップをクリックして詳細を確認し、解析の流れを掴みましょう。
+        </p>
+
+        <!-- Section: はじめに -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2><span class="icon icon-intro"></span>はじめに：CFX解析の全体像を掴もう</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <p>ANSYS CFXは、様々な流体の流れをシミュレーションできる強力なツールです。このガイドでは、CFXを使った解析の基本的な手順を、初心者にも分かりやすく解説します。</p>
+                <p>解析は、大きく分けて以下のステップで進みます：</p>
+                <ol>
+                    <li><span class="action-item">CADモデル準備 (CAD Model Preparation)：</span> 解析したい「流れの形」を3Dデータで用意します。</li>
+                    <li><span class="action-item">プロジェクト作成 (Project Creation)：</span> ANSYS WorkbenchでCFX解析の準備を始めます。</li>
+                    <li><span class="action-item">ジオメトリ処理 (Geometry Processing)：</span> CADデータを読み込み、解析に必要な「名前」を付けます。</li>
+                    <li><span class="action-item">メッシュ作成 (Mesh Generation)：</span> 「流れの形」を計算しやすいように細かく分割します。</li>
+                    <li><span class="action-item">解析設定 (Analysis Setup)：</span> 流れの性質や条件（入口、出口など）を設定します。</li>
+                    <li><span class="action-item">計算実行 (Solution Run)：</span> 設定に基づいてコンピュータに計算させます。</li>
+                    <li><span class="action-item">結果評価 (Results Evaluation)：</span> 計算結果を見て、流れの様子を分析します。</li>
+                </ol>
+                <div class="tip-box">
+                    <strong>成功へのヒント：</strong> 各ステップを丁寧に進めることが、信頼できる結果への近道です。特に「メッシュ (Mesh)」と「境界条件 (Boundary Conditions)」は結果に大きく影響します。
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: CAD準備 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2><span class="icon icon-cad"></span>Step 1: CADモデル準備 ～解析する「形」を作る～</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <p>解析のスタートは、3D CADモデルの準備です。</p>
+                <h3>1.1. 使うCADソフト (CAD Software)</h3>
+                <p>普段使っているCADソフトでOKです（例：Inventor, SolidWorksなど）。大切なのは、CFXが読み込める形式で保存できることです。</p>
+                <h3>1.2. 「流体」の形をモデリング (Modeling the "Fluid" Domain)</h3>
+                <div class="key-concept">
+                    <strong>CFXで解析するのは「流体が通る空間」そのものです。</strong>
+                    <p>例えば、パイプの中を流れる水を解析する場合、パイプ自体ではなく、パイプ内部の「水の形」をモデル化します。</p>
+                </div>
+                <h3>1.3. 保存するファイル形式 (File Format for Saving)</h3>
+                <p>作ったCADモデルは、CFXが読みやすい「中間ファイル形式」で保存します。</p>
+                <ul>
+                    <li><strong>STEP (<code>.stp</code>, <code>.step</code>)：</strong> 最もオススメ。多くのソフトで使え、形も正確に伝わります。会話ログでもこれが使われていました。</li>
+                    <li>その他：Parasolid (<code>.x_t</code>), IGES (<code>.igs</code>) など。</li>
+                </ul>
+                <p><span class="action-item">アクション (Action)：</span> CADソフトの「エクスポート (Export)」機能で、ファイルの種類を「STEP」にして保存しましょう。</p>
+                <div class="warning-box">
+                    <strong>ここ注意！ (Important Note!)：</strong>
+                    <ul>
+                        <li>細かすぎる形状や複雑すぎるモデルは、後でエラーの原因になることも。できるだけシンプルに。</li>
+                        <li>複数の部品を組み合わせている場合は、ズレや重なりがないかチェック。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: プロジェクト作成 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2><span class="icon icon-project"></span>Step 2: ANSYS Workbench起動とプロジェクト作成 ～解析の土台作り～</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <p>CADモデルができたら、次はANSYS Workbenchで解析の準備をします。</p>
+                <h3>2.1. Workbenchを起動 (Launch Workbench)</h3>
+                <p>インストールしたANSYSの中から「Workbench」を探して起動します。</p>
+                <h3>2.2. CFX解析システムを配置 (Place CFX Analysis System)</h3>
+                <p>Workbench画面の左側にある「Toolbox」から、解析の種類を選びます。</p>
+                <ol>
+                    <li>「Toolbox」の「Analysis Systems」を開きます。</li>
+                    <li>「<strong>Fluid Flow (CFX)</strong>」を見つけます。</li>
+                    <li>これをマウスで掴んで、右側の広いスペース（Project Schematic）にドラッグ＆ドロップします。</li>
+                </ol>
+                <p>これで、CFX解析に必要な部品（セル）が一式セットされます。各セルが解析のステップに対応しています（最初は「？」マークが付いています）。</p>
+            </div>
+        </div>
+
+        <!-- Section 3: ジオメトリ処理 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2><span class="icon icon-geometry"></span>Step 3: ジオメトリのインポートと編集 ～CADデータに「意味」を与える～</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <p>ここでは、準備したCADファイルを読み込み、解析に必要な「名前」を付けていきます。通常、「Geometry」セルをダブルクリックするか右クリックして「Edit Geometry in Discovery...」または「Edit Geometry in SpaceClaim...」を選びます（会話ログではDiscovery）。</p>
+                <h3>3.1. CADファイルを読み込む (Import CAD File)</h3>
+                <ol>
+                    <li>「Project Schematic」の「Geometry」セルを右クリック。</li>
+                    <li>「Import Geometry」 > 「Browse...」を選び、Step 1で保存したCADファイル (例: <code>.stp</code>) を選択。</li>
+                </ol>
+                <h3>3.2. Discovery/SpaceClaimで編集 (Edit in Discovery/SpaceClaim)</h3>
+                <p>「Geometry」セルをダブルクリックして、編集ツール（Discoveryなど）を起動します。</p>
+                <div class="highlight-box">
+                    <strong>ここが重要！ 各面に「名前」を付ける (Named Selections / Groups)</strong>
+                    <p>後で「ここは入口」「ここは壁」といった条件を設定するために、各面に分かりやすい名前を付けます。これが非常に大切です。</p>
+                    <ul>
+                        <li><code>Inlet</code>：流体の入口</li>
+                        <li><code>Outlet</code>：流体の出口</li>
+                        <li><code>Wall</code>：壁面。回転する場合は <code>RotatingWall</code> (回転壁) と <code>FixedWall</code> (固定壁) を区別。</li>
+                        <li>会話ログの例 (バランスホール)：<code>Inlet</code>, <code>Outlet</code>, <code>FixedWall_Inlet</code>, <code>RotatingWall</code> など。</li>
+                    </ul>
+                    <p><span class="action-item">アクション (Action)：</span> 面を選択し、グループ作成機能などで名前を定義します。英数字とアンダースコア推奨。</p>
+                </div>
+                <div class="key-concept">
+                    <strong>流体領域全体にも名前を付ける (Name the Entire Fluid Domain)</strong>
+                    <p>解析する流体空間全体にも名前（例：<code>Fluid</code>）を付けます。会話ログでは、流体領域全体を <code>Fluid</code> と命名していました。</p>
+                    <p><span class="action-item">アクション (Action)：</span> 流体ボリューム全体を選択（例：トリプルクリック）し、名前を付けます。</p>
+                </div>
+                <h3>3.3. 保存して閉じる (Save and Close)</h3>
+                <p>名前付けが終わったら、ファイルを保存してDiscovery/SpaceClaimを閉じます。Workbenchの「Geometry」セルにチェックマークが付くはずです。</p>
+            </div>
+        </div>
+
+        <!-- Section 4: メッシュ作成 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2><span class="icon icon-mesh"></span>Step 4: メッシュ作成 ～計算のための下準備～</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <p>ジオメトリの準備ができたら、次は「メッシュ作成 (Mesh Generation)」です。これは、計算領域を小さな要素（セル）に分割する作業です。「Mesh」セルをダブルクリックしてANSYS Meshingを起動します。</p>
+                <h3>4.1. ジオメトリの確認 (Verify Geometry)</h3>
+                <p>Meshingが起動したら、左側のツリーでジオメトリや付けた名前が正しく読み込まれているか確認します。</p>
+                <h3>4.2. 座標系の設定 (Coordinate System Setup) (オプション / Optional)</h3>
+                <p>特定の場所だけメッシュを細かくしたい場合などに、新しい座標系を作ると便利です。会話ログでは、バランスホールの中心に座標系を作っていました。</p>
+                <h3>4.3. メッシュの細かさを調整 (Adjust Mesh Density) (メッシュコントロール / Mesh Control)</h3>
+                <div class="key-concept">
+                    <strong>メッシュの品質 (Mesh Quality) は、解析の精度と計算時間に直結します。</strong>
+                </div>
+                <h4>4.3.1. 全体のメッシュ設定 (Global Mesh Settings)</h4>
+                <p>ツリーの「Mesh」を選ぶと、全体のメッシュサイズなどを設定できます。</p>
+                <h4>4.3.2. 部分的なメッシュ設定 (Local Mesh Control)</h4>
+                <p>流れが複雑な場所や、特に詳しく見たい場所（壁の近くなど）は、メッシュを細かくします。</p>
+                <p><span class="action-item">アクション (Action)：</span> ツリーの「Mesh」を右クリック → 「Insert」 → 「Sizing」などで、特定の面や領域のメッシュサイズを指定します。</p>
+                <p>会話ログでは、<code>Sphere of Influence</code> を使い、特定の座標系を中心とした球体領域内のメッシュを細かくしていました。</p>
+                <div class="highlight-box">
+                    <strong>メッシュを細かくするコツ (Tips for Refining Mesh)：</strong>
+                    <ul>
+                        <li>壁の近くには、境界層を捉えるために薄い層状のメッシュ（インフレーション / Inflation）を入れるのが一般的です。</li>
+                        <li>メッシュサイズが急に変わるのはNG。徐々に変化するように。</li>
+                        <li>細かすぎると計算が重く、粗すぎると精度が出ません。バランスが大事。</li>
+                    </ul>
+                </div>
+                <h3>4.4. メッシュ生成実行 (Generate Mesh)</h3>
+                <p>設定が終わったら、「Generate」ボタンでメッシュを生成します。</p>
+                <h3>4.5. メッシュ品質チェック (Check Mesh Quality)</h3>
+                <p>生成されたメッシュの品質を確認します。</p>
+                <ul>
+                    <li><strong>見た目チェック (Visual Inspection)：</strong>断面表示などで、おかしな形の要素がないか確認。</li>
+                    <li><strong>品質指標チェック (Quality Metrics Check)：</strong>「Quality」でSkewness（歪み度、0に近いほど良い）やOrthogonal Quality（直交性、1に近いほど良い）などを確認。</li>
+                </ul>
+                <p>問題があれば設定を調整して再生成。OKならMeshingを閉じます。「Mesh」セルにチェックマークが付きます。</p>
+            </div>
+        </div>
+
+        <!-- Section 5: 解析設定 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2><span class="icon icon-setup"></span>Step 5: セットアップ (CFX-Pre) ～流れのルールを決める～</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <p>メッシュができたら、次は物理モデルや境界条件などを設定します。「Setup」セルをダブルクリックしてCFX-Preを起動します。</p>
+                <p>CFX-Preでは、左側のツリーの上から順に設定していくと分かりやすいです。</p>
+                <h3>5.1. 解析の種類 (Analysis Type)</h3>
+                <p>「Steady State」(定常：時間変化しない流れ) か「Transient」(非定常：時間と共に変化する流れ) を選びます。</p>
+                <h3>5.2. ドメイン設定 (Domains) ～流体の性質を決める～</h3>
+                <p>Step 3で <code>Fluid</code> と名付けた領域の性質を設定します。</p>
+                <ol>
+                    <li><span class="action-item">基本設定 (Basic Settings)：</span>
+                        <ul>
+                            <li><code>Location</code>: <code>Fluid</code> 領域を選択。</li>
+                            <li><code>Material</code>: 流体の種類（例: <code>Water</code>, <code>Air Ideal Gas</code>）。会話ログでは <code>Water</code>。</li>
+                            <li><code>Reference Pressure</code>: 基準圧力（通常 <code>1 [atm]</code>）。</li>
+                        </ul>
+                    </li>
+                    <li><span class="action-item">回転設定 (Rotation Settings) (回転機械の場合 / For Rotating Machinery)：</span>
+                        <ul>
+                            <li><code>Option</code>: <code>Rotating</code> を選択。</li>
+                            <li><code>Angular Velocity</code>: 回転の速さ（例: <code>700 [rpm]</code>）。</li>
+                            <li><code>Axis Definition</code>: 回転軸。</li>
+                        </ul>
+                    </li>
+                    <li><span class="action-item">流れのモデル設定 (Flow Model Settings)：</span>
+                        <ul>
+                            <li><code>Heat Transfer</code>: 熱の伝わり方（例: <code>Thermal Energy</code>）。会話ログでは <code>Thermal Energy</code>。</li>
+                            <li><code>Turbulence</code>: 乱流モデル（流れの乱れをどう計算するか）。<code>k-Epsilon</code> や <code>SST</code> など。適切なモデル選びが重要。会話ログでは <code>SST</code> や <code>k-Epsilon</code> が候補。</li>
+                        </ul>
+                    </li>
+                </ol>
+                <h3>5.3. 境界条件設定 (Boundary Conditions) ～流れの出入り口を決める～</h3>
+                <div class="warning-box">
+                    <strong>ここ超重要！ (Crucial Point!) 境界条件は解析結果を左右します。</strong>
+                    <p>Step 3で名付けた各面（Inlet, Outlet, Wallなど）に、流れの条件を設定します。</p>
+                </div>
+                <ol>
+                    <li>ツリーのドメイン名を右クリック → 「Insert」 → 「Boundary」。</li>
+                    <li><span class="action-item">基本設定 (Basic Settings)：</span>
+                        <ul>
+                            <li><code>Boundary Type</code>: <code>Inlet</code>, <code>Outlet</code>, <code>Wall</code> などを選択。</li>
+                            <li><code>Location</code>: Step 3で付けた面の名前を選択。</li>
+                        </ul>
+                    </li>
+                    <li><span class="action-item">詳細設定 (Detailed Settings) (タイプによって変わります / Varies by type)：</span>
+                        <ul>
+                            <li><strong>Inlet (入口) の例：</strong>
+                                <ul>
+                                    <li>流量 (<code>Mass Flow Rate</code>) や速度 (<code>Normal Speed</code>) を指定。会話ログでは質量流量。</li>
+                                    <li>流入温度 (例: <code>293 [K]</code>)。</li>
+                                </ul>
+                            </li>
+                            <li><strong>Outlet (出口) の例：</strong>
+                                <ul>
+                                    <li>圧力 (<code>Static Pressure</code>) を指定。会話ログでは静圧。</li>
+                                </ul>
+                            </li>
+                            <li><strong>Wall (壁) の例：</strong>
+                                <ul>
+                                    <li>壁での流れの振る舞い (<code>No Slip Wall</code>：滑らない壁が一般的)。</li>
+                                    <li>回転壁 (<code>RotatingWall</code>) の場合、回転速度を指定。</li>
+                                    <li>固定壁 (<code>FixedWall</code>) で周りが回転している場合、相対的に逆回転させて静止を表現。</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
+                <h3>5.4. 初期化 (Initialization)</h3>
+                <p>計算開始時の初期状態を設定します。多くは自動でOKですが、収束しにくい場合は調整します。</p>
+                <h3>5.5. ソルバーコントロール (Solver Control) ～計算方法の調整～</h3>
+                <ul>
+                    <li><code>Max. Iterations</code> (最大反復回数): 計算を繰り返す上限回数。会話ログでは最初は<code>1000</code>回程度で試すことを推奨。</li>
+                    <li><code>Convergence Criteria</code> (収束判定基準):
+                        <ul>
+                            <li><code>Residual Target</code> (残差目標値): 計算誤差がどこまで小さくなったらOKとするか。通常 <code>1e-4</code> ～ <code>1e-6</code>。会話ログでは <code>1e-4</code>。</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>全ての設定が終わったらCFX-Preを保存して閉じます。「Setup」セルにチェックマークが付きます。</p>
+            </div>
+        </div>
+
+        <!-- Section 6: 計算実行 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2><span class="icon icon-solution"></span>Step 6: 計算実行 (CFX-Solver Manager) ～コンピュータにお任せ～</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <p>いよいよ計算開始です。「Solution」セルをダブルクリックしてCFX-Solver Managerを起動します。</p>
+                <h3>6.1. 計算実行の設定 (Run Settings)</h3>
+                <ul>
+                    <li><strong>Run Mode：</strong>
+                        <ul>
+                            <li><code>Serial</code> (1コアで計算) か <code>Parallel</code> (複数コアで並列計算)。</li>
+                            <li>並列計算の場合、使用コア数を指定。PCの性能やライセンス状況に合わせて。会話ログではPCの搭載コア数上限を推奨。</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>6.2. 計算スタート！ (Start Run!)</h3>
+                <p>「Start Run」ボタンで計算を開始します。</p>
+                <h3>6.3. 計算状況をチェック (Monitor Solution)</h3>
+                <p>計算中は、以下の情報を確認できます：</p>
+                <ul>
+                    <li><strong>残差プロット (Residual Plot)：</strong>計算誤差がどんどん小さくなっていくか確認。グラフが平らになれば収束のサイン。</li>
+                    <li><strong>モニタープロット (Monitor Plot)：</strong>指定した場所の圧力や速度などが安定していくか確認。</li>
+                </ul>
+                <div class="tip-box">
+                    <strong>収束しないときは… (If not converging...)</strong> メッシュ品質、境界条件、タイムスケール、乱流モデルなどを見直してみましょう。
+                </div>
+                <p>計算が正常に終わると、<code>.res</code> という結果ファイルができます。「Solution」セルにチェックマークが付きます。</p>
+            </div>
+        </div>
+
+        <!-- Section 7: 結果評価 -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2><span class="icon icon-results"></span>Step 7: ポスト処理 (CFD-Post) ～結果を見てみよう～</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <p>計算が終わったら、結果を可視化して分析します。「Results」セルをダブルクリックしてCFD-Postを起動します。</p>
+                <h3>7.1. 結果を「見える化」するツール (Visualization Tools)</h3>
+                <p>ツールバーや「Insert」メニューから、様々な表示方法を選べます。</p>
+                <ul>
+                    <li><strong>Plane (平面)：</strong>好きな場所に断面を作り、その面上の圧力や速度を色や矢印で表示。</li>
+                    <li><strong>Contour (コンター図)：</strong>圧力や温度などを色分け表示。</li>
+                    <li><strong>Vector (ベクトル図)：</strong>速度などを矢印で表示。</li>
+                    <li><strong>Streamline (流線)：</strong>流れの筋を表示。</li>
+                </ul>
+                <h3>7.2. Y+ (ワイヤープラス) の確認 (Check Y+)</h3>
+                <div class="key-concept">
+                    <strong>Y+は、壁近くのメッシュが適切かどうかの指標です。</strong>
+                    <p>使う乱流モデルによって適切なY+の値が異なります。壁面を選択し、コンター図で変数 <code>Yplus</code> を表示して確認しましょう。不適切ならメッシュ修正が必要です。</p>
+                </div>
+                <h3>7.3. 数値データを抽出 (Extract Numerical Data)</h3>
+                <ul>
+                    <li><strong>Point (点)：</strong>特定の点の圧力や速度などの値を取得。実験データとの比較に便利。</li>
+                    <li><strong>Line (線)：</strong>線上のデータ分布をグラフ化したり、CSVで出力したり。</li>
+                    <li>その他、面積分や体積分、グラフ作成、レポート作成、画像エクスポートなど。</li>
+                </ul>
+                <h3>7.4. 結果の解釈 ～何が分かったか考える～ (Interpret Results)</h3>
+                <p>可視化した結果や数値データから、流れのパターン、圧力損失、温度分布などを読み取り、設計の評価や改善に繋げます。</p>
+                <div class="tip-box">
+                    <strong>ポスト処理のコツ (Post-processing Tips)：</strong>
+                    <ul>
+                        <li>色々な角度から結果を見て、全体像を掴みましょう。</li>
+                        <li>複数の表示方法を組み合わせると、より深く理解できます。</li>
+                        <li>「この結果は本当に正しいか？」と常に考え、物理的な現象と照らし合わせることが大切です。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: 困ったときは -->
+        <div class="accordion-section">
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <h2><span class="icon icon-troubleshooting"></span>困ったときは：よくある問題と対策 (Troubleshooting)</h2>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="accordion-content">
+                <p>CFX解析で問題が起きたときのヒントです。</p>
+                <div class="table-wrapper"> <!-- テーブル横スクロール用ラッパー -->
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>こんな時 (Symptom)</th>
+                                <th>考えられる原因 (Possible Cause)</th>
+                                <th>試してみること (Suggestion)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ライセンスエラーが出る (License Error)</td>
+                                <td>ライセンスサーバーの問題、ライセンス不足 (License server issue, insufficient licenses)</td>
+                                <td>ライセンス設定確認、IT担当に相談 (Check license settings, consult IT)</td>
+                            </tr>
+                            <tr>
+                                <td>メッシュ作成でエラー／品質が悪い (Meshing error / poor quality)</td>
+                                <td>CADデータの不備、メッシュ設定が不適切 (CAD data issues, improper mesh settings)</td>
+                                <td>CADデータ修正・簡略化、メッシュ設定見直し (Fix/simplify CAD, review mesh settings)</td>
+                            </tr>
+                            <tr>
+                                <td>計算が発散する（誤差が増える） (Solution diverges - error increases)</td>
+                                <td>メッシュ品質、境界条件、タイムスケール、乱流モデル、初期値などが不適切 (Poor mesh, BCs, timescale, turbulence model, initial values)</td>
+                                <td>各設定を見直し、メッシュ品質改善、タイムスケールを小さくする (Review settings, improve mesh, reduce timescale)</td>
+                            </tr>
+                            <tr>
+                                <td>計算が収束しない（誤差が減らない） (Solution does not converge - error doesn't decrease)</td>
+                                <td>上記に加え、流れ自体が時間変化している可能性も (Above, or flow is inherently transient)</td>
+                                <td>非定常解析を検討、収束判定基準を少し緩める (Consider transient analysis, relax convergence criteria)</td>
+                            </tr>
+                            <tr>
+                                <td>計算結果が物理的におかしい (Results are physically unrealistic)</td>
+                                <td>モデル化の間違い、境界条件や材料特性の間違い、メッシュが粗すぎる (Modeling errors, incorrect BCs/material properties, coarse mesh)</td>
+                                <td>設定全体を再チェック、メッシュを細かくして再計算 (Recheck all settings, refine mesh and rerun)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="warning-box">
+                    <strong>エラーメッセージを読もう (Read Error Messages)：</strong> 計算が止まったら、CFX-Solver Managerの出力ファイル (<code>.out</code>) にエラーの詳細が書かれています。よく読んで原因を探しましょう。
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        <p>
+            このガイドはCFX解析の基本手順をまとめたものです。<br>より詳しい情報や高度な使い方は、ANSYSの公式マニュアルやトレーニング資料をご覧ください。
+        </p>
+    </footer>
+
+    <script>
+        function toggleAccordion(headerElement) {
+            const content = headerElement.nextElementSibling;
+            const icon = headerElement.querySelector('.toggle-icon');
+            const isOpen = content.classList.contains('open');
+
+            if (isOpen) {
+                content.classList.remove('open');
+                icon.textContent = '▼';
+                content.style.maxHeight = null;
+                content.style.paddingTop = null;
+                content.style.paddingBottom = null;
+            } else {
+                content.classList.add('open');
+                icon.textContent = '▲';
+                content.style.paddingTop = '20px';
+                content.style.paddingBottom = '20px';
+                content.style.maxHeight = content.scrollHeight + 40 + "px"; // 上下パディング 20px * 2 = 40px
+            }
+        }
+    </script>
+</body>
+</html>
